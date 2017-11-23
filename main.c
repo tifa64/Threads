@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-void buildMat(int mat[][1000], int i, int j, char *line, int *columns) {
+void buildMat(int mat[][10], int i, int j, char *line, int *columns) {
     int iline = 0, jj = 0, k;
     char tempchar[j];
     int tempint = 0, col;
@@ -24,9 +24,9 @@ int main()
 {
     FILE * fp1, * fp2;
     char * line1 = NULL, * line2 = NULL;
-    int mat1[1000][1000], mat2[1000][1000];
-    int i = 0, j = 0;
-    int rows1 = 0, *columns1 = 0, rows2 = 0, *columns2 = 0;
+    int mat1[10][10], mat2[10][10], mat3[10][10];
+    int i = 0, j = 0, k = 0;
+    int rows1 = 0, columns1 = 0, rows2 = 0, columns2 = 0;
     size_t len = 0;
     ssize_t read1, read2;
     fp1 = fopen("Matrix1.txt", "r");
@@ -39,6 +39,11 @@ int main()
     fclose(fp1);
     if (line1)
         free(line1);
+    for(i = 0; i < rows1; i++){
+        for(j = 0; j < columns1 ; j++)
+            printf("%d ", mat1[i][j]);
+        printf("\n");
+    }
 
     i = j = len = 0;
     fp2 = fopen("Matrix2.txt", "r");
@@ -51,14 +56,25 @@ int main()
     fclose(fp2);
     if (line2)
         free(line2);
-
-    intk;
-    for (i = 0 ; i < rows1 ; i++){
-        for(j = 0 ; j < columns2 ; j++){
-            for()
-        }
+    for(i = 0; i < rows2; i++){
+        for(j = 0; j < columns2; j++)
+            printf("%d ", mat2[i][j]);
+        printf("\n");
     }
-
+    for(i = 0; i < rows1; i++){
+        for(j = 0; j < columns1; j++)
+            mat3[i][j] = 0;
+    }
+    for(i = 0; i < rows1; i++){
+        for(j = 0; j < columns2; j++)
+            for(k = 0; k < columns1; k ++)
+                mat3[i][j] += mat1[i][k] * mat2[k][j];
+    }
+	for(i = 0; i < rows1; i++){
+        for(j = 0; j < columns2; j++)
+            printf("%d ", mat3[i][j]);
+		printf("\n");
+    }
 
     exit(EXIT_SUCCESS);
     return 0;
