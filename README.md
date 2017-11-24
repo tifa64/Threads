@@ -8,9 +8,9 @@
     
 ## To Do ##
 
-- [ ] Threads elements
-- [ ] Threads rows
+- [X] Threads elements
+- [X] Threads rows
 - [ ] Measure time (in C)
-- [ ] Generate testcases
+- [X] Generate testcases
 - [ ] Write report
 - [ ] Make graphs on powerpoint to compare
