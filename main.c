@@ -8,26 +8,26 @@ Implementation of a multi-threaded matrix multiplication program.
 int B[3][2] = {{7,8},{9,10},{11,12}};
 int c[2][2] ;
 */
-
 float **A =NULL;
 float **B =NULL;
 float **C =NULL;
-
 int m,t,n;
-
-
-// function contain main loops for matmult
+//Function contain main loops for matmult
 void matrixmultperElement();
-// function to multiply elements for each thread
-void *threadedMatmultPerElement ();
-void buildMat();
+//Function to multiply elements for each thread
+void *threadedMatmultPerElement();
+//Function contain main loops for matmult
+void matrixmultperRow();
+//Function to multiply elements for each row
+void *threadedMatmultPerRow();
 
-struct eleposition
-{
+//Function to build matrix
+void buildMat();
+//To pass row and column attributes to the thread
+struct eleposition {
     int row;
     int column;
 };
-
 int main()
 {
     //Three pointer files fot the 3 matrices
@@ -93,85 +93,83 @@ int main()
 		fprintf(fp3, "\n");
     }
 	fclose(fp3);
-    m=rows1;
-    t=columns1;
-    n=columns2;
-   // printf("m=%d t=%d n=%d  ",m,t,n);
-    A= (float **)malloc(m * sizeof(float*));
-    int x=0,z=0;
+    m = rows1;
+    t = columns1;
+    n = columns2;
+    A = (float **)malloc(m * sizeof(float*));
+    int x = 0,z = 0;
     //allocating columns memory
-    for (x=0; x<m; x++)
-    {
-        A[x]=(float *)malloc(t* sizeof(float));
+    for (x = 0; x < m; x++) {
+        A[x] = (float *)malloc(t* sizeof(float));
     }
     //copying from mat1 to A
-    for (x=0; x<m; x++)
-    {
-        for (z=0; z<t; z++)
-            A[x][z]=mat1[x][z];
+    for (x = 0; x < m; x++) {
+        for (z = 0; z < t; z++)
+            A[x][z] = mat1[x][z];
     }
     printf("A\n");
-    for (x=0; x<m; x++)
-    {
-        for (z=0; z<t; z++)
-        {
+    for (x = 0; x < m; x++) {
+        for (z = 0; z < t; z++) {
             printf("%f ", A[x][z] );
         }
         printf("\n");
     }
+    printf("\n");
 //*****************************************************************************
     //allocating rows memory
     B= (float **)malloc(t * sizeof(float*));
     //allocating columns memory
-    for (x=0; x<t; x++)
-    {
+    for (x = 0; x < t; x++) {
         B[x]=(float *)malloc(n* sizeof(float));
     }
     //copying from mat2 to B
-    for (x=0; x<t; x++)
-    {
-        for (z=0; z<n; z++)
-            B[x][z]=mat2[x][z];
+    for (x = 0; x < t; x++) {
+        for (z = 0; z < n; z++)
+            B[x][z] = mat2[x][z];
     }
     printf("B\n");
-    for (x=0; x<t; x++)
-    {
-        for (z=0; z<n; z++)
-        {
+    for (x = 0; x < t; x++) {
+        for (z = 0; z < n; z++) {
             printf("%f ", B[x][z] );
         }
         printf("\n");
-
     }
+    printf("\n");
 //*****************************************************************************
     C= (float **)malloc(m * sizeof(float*));
     //allocating columns memory
-    for (x=0; x<m; x++)
-    {
+    for (x = 0; x < m; x++) {
         C[x]=(float *)malloc(n* sizeof(float));
     }
-
+    //Element threading
     matrixmultperElement();
+    printArray();
+    printf("\n");
+//*****************************************************************************
+    C= (float **)malloc(m * sizeof(float*));
+    //allocating columns memory
+    for (x = 0; x < m; x++) {
+        C[x] = (float *)malloc(n* sizeof(float));
+    }
+    //Row threading
+    matrixmultperRow();
     printArray();
     // MulwithoutThreads();
     exit(EXIT_SUCCESS);
     return 0;
 }
-void matrixmultperElement()
-{
-    // calculating number of elements in c to creat threads
+void matrixmultperElement() {
+    //calculating number of elements in c to creat threads
     int size = sizeof(C)/sizeof(C[0][0]);
     //array of threads
     pthread_t tid[size];
     pthread_attr_t attr ;
     pthread_attr_init(&attr);
     //threads itrator
-    int q=0;
-    int i,j;
-    for (i=0; i<m; i++)
-    {
-        for (j=0; j<n; j++)
-        {
+    int q = 0;
+    int i, j;
+    for (i = 0; i < m; i++) {
+        for (j = 0; j < n; j++) {
             struct eleposition *ptr ;
             ptr = (struct eleposition*)malloc(sizeof(struct eleposition));
             ptr->row = i;
@@ -180,40 +178,59 @@ void matrixmultperElement()
             q++;
         }
     }
-    // waiting for all threads to finish
+    //waiting for all threads to finish
     int z;
-    for (z=0; z<size ; z++) {
+    for (z = 0; z < size; z++) {
         pthread_join(tid[z],NULL);
     }
-    //printf("k=%d \n",k);
 }
-void *threadedMatmultPerElement (void *ptr)
-{
-
-    // ask leh mknsh bysht8l mn 8er da?!!!
+void *threadedMatmultPerElement (void *ptr) {
     struct eleposition *pos ;
     pos= ptr;
     int i;
     float result=0;
-   // printf("here k= %d",t);
     for (i=0; i<t; i++) {
         result+=  A[pos->row][i] * B[i][pos->column];
-       // printf("---->%d",result);
     }
     C[pos->row][pos->column] = result;
-    //printf("result  c= %f\n",result);
-
     pthread_exit(0);
 }
-void printArray()
-{
-    int i,j;
-    for (i=0; i<m; i++) {
-        for (j=0; j<n; j++) {
-            printf("%f\t",C[i][j]);
-        }
-        printf("\n");
+void matrixmultperRow() {
+    //array of threads
+    pthread_t tid[m];
+    pthread_attr_t attr ;
+    pthread_attr_init(&attr);
+    //threads itrator
+    int i;
+    for (i = 0; i < m; i++) {
+        pthread_create(&tid[i],&attr,threadedMatmultPerRow,i);
     }
+    //waiting for all threads to finish
+    int z;
+    for (z = 0; z < m ; z++) {
+        pthread_join(tid[z],NULL);
+    }
+}
+void *threadedMatmultPerRow (int r) {
+    int i = r;
+    int j, k;
+    float result=0;
+    for(j = 0; j < n; j++)
+            for(k = 0; k < t; k ++)
+                C[i][j] += A[i][k] * B[k][j];
+    pthread_exit(0);
+}
+void printArray() {
+    FILE *fp3;
+    int i,j;
+    fp3 = fopen("Matrix3.txt","w");
+	//Dimensions of result matrix is rows1 * columns2
+	for(i = 0; i < m; i++){
+        for(j = 0; j < n; j++)
+            fprintf(fp3, "%f ", C[i][j]);
+		fprintf(fp3, "\n");
+    }
+	fclose(fp3);
 }
 //Passing the array, row# and length of the line read from the matrix
 //The columns are calculated inside the function, they are passed as pointer since the funcation is void
@@ -242,3 +259,4 @@ void buildMat(float mat[][10], int i, int j, char *line, int *columns) {
     //We we set the value of the columns
     *columns = jj;
 }
+
