@@ -5,3 +5,12 @@
 * A parallelized version of matrix multiplication can be done using one of these two methods: 
     1. A thread computes each row in the output C matrix. 
     2. A thread computes each element in the output C matrix.
+    
+## To Do ##
+
+-[] Threads elements
+-[] Threads rows
+-[] Measure time (in C)
+-[] Generate testcases
+-[] Write report
+-[] Make graphs on powerpoint to compare
