@@ -1,16 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-void buildMat(int mat[][10], int i, int j, char *line, int *columns) {
-    int iline = 0, jj = 0, k;
+void buildMat(float mat[][10], int i, int j, char *line, int *columns) {
+    int iline = 0, jj = 0, col;
     char tempchar[j];
-    int tempint = 0, col;
+    float tempint = 0;
     for(col = 0; col < j; col++) {
 		if(line[col] == ' ' || col == j-1) {
 			if(tempchar != NULL) {
-				tempint = 0;
-	        	for(k = 0; k < iline; k++) {
-		    		tempint = tempint * 10 + ( tempchar[k] - '0' );
-    			}
+				tempint = atof(tempchar);
 				mat[i][jj++] = tempint;
 			}
 			iline = 0;
@@ -22,9 +19,9 @@ void buildMat(int mat[][10], int i, int j, char *line, int *columns) {
 }
 int main()
 {
-    FILE * fp1, * fp2;
-    char * line1 = NULL, * line2 = NULL;
-    int mat1[10][10], mat2[10][10], mat3[10][10];
+    FILE *fp1, *fp2, *fp3;
+    char *line1 = NULL, *line2 = NULL;
+    float mat1[10][10], mat2[10][10], mat3[10][10];
     int i = 0, j = 0, k = 0;
     int rows1 = 0, columns1 = 0, rows2 = 0, columns2 = 0;
     size_t len = 0;
@@ -39,12 +36,6 @@ int main()
     fclose(fp1);
     if (line1)
         free(line1);
-    for(i = 0; i < rows1; i++){
-        for(j = 0; j < columns1 ; j++)
-            printf("%d ", mat1[i][j]);
-        printf("\n");
-    }
-
     i = j = len = 0;
     fp2 = fopen("Matrix2.txt", "r");
     if (fp2 == NULL)
@@ -56,11 +47,6 @@ int main()
     fclose(fp2);
     if (line2)
         free(line2);
-    for(i = 0; i < rows2; i++){
-        for(j = 0; j < columns2; j++)
-            printf("%d ", mat2[i][j]);
-        printf("\n");
-    }
     for(i = 0; i < rows1; i++){
         for(j = 0; j < columns1; j++)
             mat3[i][j] = 0;
@@ -70,12 +56,14 @@ int main()
             for(k = 0; k < columns1; k ++)
                 mat3[i][j] += mat1[i][k] * mat2[k][j];
     }
+	fp3 = fopen("Matrix3.txt","w");
+	
 	for(i = 0; i < rows1; i++){
         for(j = 0; j < columns2; j++)
-            printf("%d ", mat3[i][j]);
-		printf("\n");
+            fprintf(fp3, "%f ", mat3[i][j]);
+		fprintf(fp3, "\n");
     }
-
+	fclose(fp3);
     exit(EXIT_SUCCESS);
     return 0;
 }
