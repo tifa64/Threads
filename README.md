@@ -10,7 +10,7 @@
 
 - [X] Threads elements
 - [X] Threads rows
-- [ ] Measure time (in C)
+- [X] Measure time (in C)
 - [X] Generate testcases
-- [ ] Write report
-- [ ] Make graphs on powerpoint to compare
+- [X] Write report
+- [X] Make graphs on powerpoint to compare
